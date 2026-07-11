@@ -51,7 +51,6 @@ python main.py
 - ✅ Phase 5 — Video Preview
 - ✅ Phase 6 — Download Progress
 - ✅ Phase 7 — Playlist Download
-- ⏳ Phase 8 — Playlist Synchronization
+- ✅ Phase 8 — Playlist Synchronization
 - ⏳ Phase 9 — Settings
 - ⏳ Phase 10 — Build & Release
-
