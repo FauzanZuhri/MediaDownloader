@@ -22,7 +22,10 @@ class MainWindow(ctk.CTk):
         
         self._create_widgets()
         
-        self.downloader = YtdlpManager(log_callback=self.log_area.write_log)
+        self.downloader = YtdlpManager(
+            log_callback=self.log_area.write_log,
+            progress_callback=self._update_ui_progress
+        )
         
         # BINDING EVENT: Memicu preview saat user menekan Enter atau klik di luar text box
         self.url_entry.bind("<Return>", lambda e: self._start_preview_thread())
@@ -190,3 +193,19 @@ class MainWindow(ctk.CTk):
         if selected_dir:
             self.path_entry.delete(0, "end")
             self.path_entry.insert(0, selected_dir)
+    
+    def _update_ui_progress(self, data: dict):
+        """
+        Menerima data progress dari core downloader dan memperbarui widget UI.
+        Fungsi ini berjalan aman karena dipanggil secara dinamis.
+        """
+        percentage = data.get('percentage', 0.0)
+        speed = data.get('speed', '0 KB/s')
+        eta = data.get('eta', '00:00')
+        status = data.get('status', 'Status: Idle')
+
+        # Update komponen visual CustomTkinter
+        self.progress_bar.set(percentage)
+        self.speed_label.configure(text=f"Speed: {speed}")
+        self.eta_label.configure(text=f"ETA: {eta}")
+        self.status_label.configure(text=status)
