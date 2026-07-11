@@ -3,6 +3,7 @@ import requests
 from io import BytesIO
 from PIL import Image
 from yt_dlp import YoutubeDL
+from core.config import Config
 
 class YtdlpManager:
     def __init__(self, log_callback=None, progress_callback=None):
@@ -71,30 +72,25 @@ class YtdlpManager:
 
         self._ui_log(f"[System] Memulai proses untuk: {url}")
         
-        # Konfigurasi dasar yt-dlp (Tanpa mematikan playlist secara absolut)
+        if 'playlist' in url.lower():
+            out_template = os.path.join(output_dir, '%(playlist_title)s', '%(title)s.%(ext)s')
+            is_playlist = True
+        else:
+            out_template = os.path.join(output_dir, '%(title)s.%(ext)s')
+            is_playlist = False
+
         ydl_opts = {
-            # Menggunakan subfolder penamaan playlist jika ada agar file rapi
-            # '%(playlist_title)s' otomatis membuat folder nama playlist, jika bukan playlist akan langsung ke folder utama
-            'outtmpl': os.path.join(output_dir, '%(playlist_title)s', '%(title)s.%(ext)s') if 'playlist' in url.lower() else os.path.join(output_dir, '%(title)s.%(ext)s'),
-            
+            'outtmpl': out_template,
             'logger': MyYtdlpLogger(self.log_callback),
             'ffmpeg_location': '.', 
             'progress_hooks': [self._my_progress_hook],
+            'noplaylist': not is_playlist,
+            
+            # TAHAP 8: Mengaktifkan rekam jejak unduhan (Archive Mode)
+            # File 'download_archive.txt' akan otomatis dibuat di folder utama proyek
+            'download_archive': Config.ARCHIVE_FILE,
         }
 
-        # Cek apakah URL mengandung playlist
-        if 'playlist' in url.lower():
-            self._ui_log("[System] Playlist terdeteksi. Memproses seluruh daftar lagu...")
-            ydl_opts.update({
-                'noplaylist': False,      # Aktifkan download playlist
-                'continue_dl': True,      # Lanjutkan jika ada yang terputus
-            })
-        else:
-            ydl_opts.update({
-                'noplaylist': True,       # Matikan playlist jika hanya video biasa
-            })
-
-        # Pengaturan format MP3 / MP4 (Sama seperti Tahap 6)
         if format_type == "MP3":
             ydl_opts.update({
                 'format': 'bestaudio/best',
@@ -113,14 +109,14 @@ class YtdlpManager:
         try:
             with YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
-            self._ui_log("[Sukses] Semua unduhan dalam antrean selesai!")
+            self._ui_log("[Sukses] Semua unduhan selesai!")
             if self.progress_callback:
                 self.progress_callback({
                     'percentage': 1.0, 'speed': '0 KB/s', 'eta': '00:00', 'status': "Status: Selesai!"
                 })
         except Exception as e:
             self._ui_log(f"[Error] Terjadi kesalahan: {str(e)}")
-            
+
 class MyYtdlpLogger:
     def __init__(self, log_callback):
         self.log_callback = log_callback
