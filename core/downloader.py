@@ -71,16 +71,30 @@ class YtdlpManager:
 
         self._ui_log(f"[System] Memulai proses untuk: {url}")
         
+        # Konfigurasi dasar yt-dlp (Tanpa mematikan playlist secara absolut)
         ydl_opts = {
-            'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
-            'noplaylist': True,
+            # Menggunakan subfolder penamaan playlist jika ada agar file rapi
+            # '%(playlist_title)s' otomatis membuat folder nama playlist, jika bukan playlist akan langsung ke folder utama
+            'outtmpl': os.path.join(output_dir, '%(playlist_title)s', '%(title)s.%(ext)s') if 'playlist' in url.lower() else os.path.join(output_dir, '%(title)s.%(ext)s'),
+            
             'logger': MyYtdlpLogger(self.log_callback),
             'ffmpeg_location': '.', 
-            
-            # DAFTARKAN HOOK PROGRESS DI SINI
             'progress_hooks': [self._my_progress_hook],
         }
 
+        # Cek apakah URL mengandung playlist
+        if 'playlist' in url.lower():
+            self._ui_log("[System] Playlist terdeteksi. Memproses seluruh daftar lagu...")
+            ydl_opts.update({
+                'noplaylist': False,      # Aktifkan download playlist
+                'continue_dl': True,      # Lanjutkan jika ada yang terputus
+            })
+        else:
+            ydl_opts.update({
+                'noplaylist': True,       # Matikan playlist jika hanya video biasa
+            })
+
+        # Pengaturan format MP3 / MP4 (Sama seperti Tahap 6)
         if format_type == "MP3":
             ydl_opts.update({
                 'format': 'bestaudio/best',
@@ -99,18 +113,14 @@ class YtdlpManager:
         try:
             with YoutubeDL(ydl_opts) as ydl:
                 ydl.download([url])
-            self._ui_log("[Sukses] Download dan konversi selesai murni!")
+            self._ui_log("[Sukses] Semua unduhan dalam antrean selesai!")
             if self.progress_callback:
                 self.progress_callback({
                     'percentage': 1.0, 'speed': '0 KB/s', 'eta': '00:00', 'status': "Status: Selesai!"
                 })
         except Exception as e:
             self._ui_log(f"[Error] Terjadi kesalahan: {str(e)}")
-            if self.progress_callback:
-                self.progress_callback({
-                    'percentage': 0.0, 'speed': '0 KB/s', 'eta': '00:00', 'status': "Status: Error!"
-                })
-
+            
 class MyYtdlpLogger:
     def __init__(self, log_callback):
         self.log_callback = log_callback
