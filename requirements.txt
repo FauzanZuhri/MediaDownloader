@@ -2,4 +2,4 @@ customtkinter
 yt-dlp
 pillow
 requests
-mutagen
+eyed3
