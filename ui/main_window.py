@@ -1,3 +1,4 @@
+import os
 import customtkinter as ctk
 from tkinter import filedialog
 import threading
@@ -30,7 +31,7 @@ class MainWindow(ctk.CTk):
         # BINDING EVENT: Memicu preview saat user menekan Enter atau klik di luar text box
         self.url_entry.bind("<Return>", lambda e: self._start_preview_thread())
         self.url_entry.bind("<FocusOut>", lambda e: self._start_preview_thread())
-        
+
     def _create_widgets(self):
         # ... (Gunakan widget dari Tahap 2 & 3, pastikan nama komponennya sama) ...
         self.header_label = ctk.CTkLabel(self, text=Config.APP_TITLE, font=("Arial", 20, "bold"))
@@ -112,7 +113,7 @@ class MainWindow(ctk.CTk):
         self.cancel_btn = ctk.CTkButton(self.btn_frame, text="Cancel", width=120, fg_color="#a83232", hover_color="#822222")
         self.cancel_btn.grid(row=0, column=1, padx=10)
         
-        self.open_folder_btn = ctk.CTkButton(self.btn_frame, text="Open Folder", width=120, fg_color="#333333", hover_color="#444444")
+        self.open_folder_btn = ctk.CTkButton(self.btn_frame, text="Open Folder",command=self.open_download_folder, width=120, fg_color="#333333", hover_color="#444444")
         self.open_folder_btn.grid(row=0, column=2, padx=10)
 
     # ==========================================
@@ -127,6 +128,19 @@ class MainWindow(ctk.CTk):
         self.status_label.configure(text="Status: Mengambil preview...")
         preview_thread = threading.Thread(target=self._load_preview_data, args=(url,), daemon=True)
         preview_thread.start()
+    
+    def open_download_folder(self):
+        """
+        Membuka folder unduhan secara otomatis di Windows Explorer.
+        """
+        # Ambil path folder langsung dari input entry yang ada di UI kamu
+        folder_path = self.path_entry.get() 
+        
+        if os.path.exists(folder_path):
+            # Menggunakan os.startfile khusus untuk Windows agar Explorer langsung terbuka
+            os.startfile(folder_path)
+        else:
+            self.log_message("[Error] Folder tujuan tidak ditemukan atau belum dibuat!")
 
     def _load_preview_data(self, url):
         info = self.downloader.fetch_metadata(url)
@@ -176,14 +190,25 @@ class MainWindow(ctk.CTk):
                 self.info_panel.thumbnail_label.configure(text="No Image")
 
     def _start_download_thread(self):
-        url = self.url_entry.get()
+        url = self.url_entry.get().strip()
         output_dir = self.path_entry.get()
         format_type = self.format_var.get()
         
-        self.status_label.configure(text="Status: Downloading...")
+        # Mengambil data setting dari widget UI secara dinamis
+        quality_setting = self.quality_dropdown.get()
+        embed_meta = bool(self.meta_cb.get())   
+        embed_thumb = bool(self.thumb_cb.get()) 
+        
+        if not url:
+            self.log_area.write_log("[Error] Silakan masukkan URL terlebih dahulu!")
+            return
+            
+        self.status_label.configure(text="Status: Memulai antrean...")
+        
+        # Pastikan urutan args ini: (url, output_dir, format_type, quality_setting, embed_meta, embed_thumb)
         download_thread = threading.Thread(
             target=self.downloader.download,
-            args=(url, output_dir, format_type),
+            args=(url, output_dir, format_type, quality_setting, embed_meta, embed_thumb),
             daemon=True
         )
         download_thread.start()
