@@ -1,4 +1,5 @@
-customtkinter>=5.2.0
-Pillow>=10.0.0
-requests>=2.31.0
-yt-dlp>=2025.01.01
+customtkinter
+yt-dlp
+pillow
+requests
+mutagen
