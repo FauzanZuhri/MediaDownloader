@@ -1,56 +1,204 @@
-# Personal Music Downloader 🎵
+# 🎵 Personal Music Downloader
 
-Aplikasi desktop berbasis Python yang dirancang khusus untuk mengunduh musik atau video dari YouTube secara personal. Aplikasi ini ringan, modern, cepat, dan berfokus pada fungsionalitas serta kestabilan.
+> **Modern Desktop Music Downloader** untuk Windows yang dapat mengunduh lagu maupun playlist dari YouTube, mengubahnya menjadi **MP3 berkualitas tinggi**, serta menambahkan **metadata lengkap** dan **cover album** secara otomatis.
 
-## 🚀 Fitur Utama (Progressive Development)
-* **Single & Playlist Downloader**: Mengunduh video tunggal atau seluruh isi playlist YouTube secara otomatis.
-* **Format Konversi Otomatis**: Mengonversi hasil unduhan langsung menjadi format MP3 murni kualitas tinggi menggunakan FFmpeg.
-* **Real-Time Progress Tracker**: Menampilkan persentase unduhan, kecepatan internet, dan estimasi waktu selesai (ETA) secara langsung di UI.
-* **Asynchronous Architecture**: Menggunakan *multithreading* agar UI tetap responsif dan tidak membeku (*not responding*) saat proses unduhan berjalan.
-* **Smart Folder Structuring**: Otomatis membuat subfolder khusus berdasarkan nama playlist agar file lagu tertata rapi.
+---
 
-## 🛠️ Teknologi yang Digunakan
-* **Python 3.12+** (Bahasa pemrograman utama)
-* **CustomTkinter** (Framework UI modern & clean)
-* **yt-dlp** (Mesin pengunduh video/audio yang bertenaga)
-* **FFmpeg** (Alat pemroses dan konversi audio)
-* **Pillow & Requests** (Pengolah data thumbnail untuk fitur live preview)
+## ✨ Features
 
-## 📦 Prasyarat & Instalasi
+- 🎵 **Single & Playlist Download**
+  - Download satu lagu atau seluruh playlist sekaligus.
 
-### 1. Clone Repositori
+- 🎧 **Automatic MP3 Conversion**
+  - Audio langsung dikonversi ke format MP3 menggunakan FFmpeg.
+
+- 🏷️ **Automatic Metadata**
+  - Menambahkan informasi:
+    - Judul Lagu
+    - Artis
+    - Album
+    - Cover Art
+
+- 🚫 **Download Archive**
+  - Mencegah lagu yang sama terunduh dua kali.
+
+- 🎨 **Modern User Interface**
+  - Dibangun menggunakan **CustomTkinter** dengan tampilan modern dan Dark Mode.
+
+- 📂 **Open Download Folder**
+  - Membuka folder hasil download hanya dengan satu klik.
+
+---
+
+# 🚀 Download
+
+Tidak perlu menginstal Python ataupun FFmpeg.
+
+### Langkah Instalasi
+
+1. Buka halaman **Releases**
+2. Download file `.zip` terbaru
+3. Ekstrak file
+4. Jalankan **main.exe**
+
+> 📦 Semua dependency sudah termasuk di dalam aplikasi.
+
+---
+
+# 🛠️ Developer Guide
+
+Panduan ini ditujukan bagi developer yang ingin memodifikasi aplikasi.
+
+## Prasyarat
+
+- Python **3.12**
+- FFmpeg
+- FFprobe
+
+Struktur folder:
+
+```
+Personal-Music-Downloader/
+│
+├── core/
+│   ├── config.py
+│   └── downloader.py
+│
+├── ui/
+│   ├── components.py
+│   └── main_window.py
+│
+├── main.py
+├── requirements.txt
+├── README.md
+├── ffmpeg.exe
+├── ffprobe.exe
+└── download_archive.txt
+```
+
+---
+
+## 1️⃣ Clone Repository
+
 ```bash
 git clone https://github.com/FauzanZuhri/Personal-Music-Downloader.git
-cd personal-music-downloader
+
+cd Personal-Music-Downloader
 ```
-### 2. Instal Dependency
-Pastikan kamu menggunakan Python 3.12, lalu instal library yang dibutuhkan:
+
+---
+
+## 2️⃣ Buat Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+Windows
+
+```bash
+.venv\Scripts\activate
+```
+
+Mac / Linux
+
+```bash
+source .venv/bin/activate
+```
+
+---
+
+## 3️⃣ Install Dependency
+
 ```bash
 pip install -r requirements.txt
 ```
-### 3. Setup FFmpeg (Wajib)
-Aplikasi ini membutuhkan biner ffmpeg.exe dan ffprobe.exe untuk melakukan konversi ke MP3.
-- Unduh biner FFmpeg untuk OS kamu.
 
-- Letakkan file ffmpeg.exe dan ffprobe.exe langsung di dalam folder utama proyek ini (sejajar dengan main.py).
+---
 
+## 4️⃣ Jalankan Aplikasi
 
-## 🎮 Cara Menjalankan Aplikasi
-Jalankan perintah berikut di terminal pada direktori utama proyek:
 ```bash
 python main.py
 ```
-## 📈 Development Progress
 
-**Overall Progress:** 90% (9/10 Phases Completed)
+---
 
-- ✅ Phase 1 — Planning & Architecture
-- ✅ Phase 2 — UI Development
-- ✅ Phase 3 — yt-dlp Integration
-- ✅ Phase 4 — FFmpeg Integration
-- ✅ Phase 5 — Video Preview
-- ✅ Phase 6 — Download Progress
-- ✅ Phase 7 — Playlist Download
-- ✅ Phase 8 — Playlist Synchronization
-- ✅ Phase 9 — Settings
-- ⏳ Phase 10 — Build & Release
+# 📦 Build Menjadi EXE
+
+Gunakan PyInstaller.
+
+```bash
+pyinstaller ^
+--noconfirm ^
+--onedir ^
+--windowed ^
+--add-data ".venv/Lib/site-packages/customtkinter;customtkinter/" ^
+--add-binary "ffmpeg.exe;." ^
+--add-binary "ffprobe.exe;." ^
+main.py
+```
+
+---
+
+# 🧰 Built With
+
+| Teknologi | Fungsi |
+|-----------|--------|
+| CustomTkinter | Modern GUI |
+| yt-dlp | Download Engine |
+| FFmpeg | Audio Conversion |
+| Mutagen | Metadata Injection |
+| Pillow | Cover Art Processing |
+| PyInstaller | Build EXE |
+
+---
+
+# 📂 Output
+
+Setelah proses selesai, file MP3 akan berisi:
+
+- ✅ Judul Lagu
+- ✅ Nama Artis
+- ✅ Album
+- ✅ Cover Art
+- ✅ Metadata ID3 v2.3
+
+Siap diputar di:
+
+- Spotify Local Files
+- AIMP
+- MusicBee
+- Windows Media Player
+- Android Music Player
+
+---
+
+# 📌 Roadmap
+
+- [x] Single Download
+- [x] Playlist Download
+- [x] Automatic MP3 Conversion
+- [x] Metadata Injection
+- [x] Cover Art
+- [x] Download Archive
+- [ ] Download Progress Bar
+- [ ] Settings Page
+- [ ] Update Checker
+- [ ] Multi-language Support
+
+---
+
+# 🤝 Contributing
+
+Pull Request selalu diterima.
+
+Jika menemukan bug atau memiliki ide fitur baru, silakan buat **Issue** terlebih dahulu sebelum membuat Pull Request.
+
+---
+
+# ⭐ Support
+
+Jika project ini bermanfaat, jangan lupa berikan ⭐ pada repository ini.
+
+Terima kasih ❤️
