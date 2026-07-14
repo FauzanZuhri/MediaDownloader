@@ -1,15 +1,8 @@
-# Python cache
-__pycache__/
-*.pyc
-
-# Virtual Environment
 .venv/
-venv/
-ENV/
-
-# FFmpeg Binaries
+__pycache__/
+build/
+dist/
+*.spec
 ffmpeg.exe
 ffprobe.exe
-
-# File log atau arsip buatan aplikasi
 download_archive.txt
