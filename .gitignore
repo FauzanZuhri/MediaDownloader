@@ -6,3 +6,4 @@ dist/
 ffmpeg.exe
 ffprobe.exe
 download_archive.txt
+*.lnk

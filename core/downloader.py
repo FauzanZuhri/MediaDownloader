@@ -14,12 +14,20 @@ class YtdlpManager:
     def __init__(self, log_callback=None, progress_callback=None):
         self.log_callback = log_callback
         self.progress_callback = progress_callback
+        self.cancel_requested = False
+
+    def cancel(self):
+        self.cancel_requested = True
+        self._ui_log("[System] Meminta pembatalan unduhan...")
 
     def _ui_log(self, message: str):
         if self.log_callback:
             self.log_callback(message)
 
     def _my_progress_hook(self, d):
+        if self.cancel_requested:
+            raise Exception("Download dibatalkan oleh pengguna.")
+
         if d['status'] == 'downloading':
             total_bytes = d.get('total_bytes') or d.get('total_bytes_estimate') or 0
             downloaded_bytes = d.get('downloaded_bytes', 0)
@@ -54,6 +62,7 @@ class YtdlpManager:
             'extract_flat': 'in_playlist',
             'skip_download': True,
             'ffmpeg_location': ffmpeg_dir,
+            'remote_components': ['ejs:github'],
         }
         try:
             with YoutubeDL(ydl_opts) as ydl:
@@ -121,7 +130,7 @@ class YtdlpManager:
         except Exception as e:
             self._ui_log(f"[Mutagen Error] Gagal menulis metadata: {str(e)}")
 
-    def download(self, url: str, output_dir: str, format_type: str, quality_setting: str, embed_meta: bool, embed_thumb: bool):
+    def download(self, url: str, output_dir: str, format_type: str, quality_setting: str, embed_meta: bool, embed_thumb: bool, use_archive: bool = True):
         """
         Proses download yt-dlp menggunakan Postprocessor kustom untuk menyuntik metadata
         secara realtime (berlaku untuk single video maupun playlist).
@@ -130,6 +139,7 @@ class YtdlpManager:
             self._ui_log("[Error] URL tidak boleh kosong!")
             return
 
+        self.cancel_requested = False
         self._ui_log(f"[System] Memulai proses untuk: {url}")
         
         if 'playlist' in url.lower():
@@ -150,16 +160,14 @@ class YtdlpManager:
             'ffmpeg_location': ffmpeg_dir, 
             'progress_hooks': [self._my_progress_hook],
             'noplaylist': not is_playlist,
-            'download_archive': Config.ARCHIVE_FILE,
             'writethumbnail': False,      
             'embedmetadata': False,        
             'embedthumbnail': False,      
-
-            'extractor_args': {'youtube': {'player_client': ['web', 'default']}},
-            'http_headers': {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            },
+            'remote_components': ['ejs:github'],
         }
+
+        if use_archive:
+            ydl_opts['download_archive'] = Config.ARCHIVE_FILE
 
         if format_type == "MP3":
             bitrate_map = {"Best Audio": "0", "320kbps": "320", "192kbps": "192", "128kbps": "128"}
@@ -172,6 +180,10 @@ class YtdlpManager:
                     'preferredcodec': 'mp3',
                     'preferredquality': preferred_quality,
                 }]
+            })
+        else:
+            ydl_opts.update({
+                'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
             })
 
         try:
@@ -234,7 +246,18 @@ class YtdlpManager:
                     'percentage': 1.0, 'speed': '0 KB/s', 'eta': '00:00', 'status': "Status: Selesai!"
                 })
         except Exception as e:
-            self._ui_log(f"[Error] Terjadi kesalahan saat download: {str(e)}")
+            if self.cancel_requested or "dibatalkan" in str(e).lower():
+                self._ui_log("[System] Unduhan telah dibatalkan.")
+                if self.progress_callback:
+                    self.progress_callback({
+                        'percentage': 0.0, 'speed': '0 KB/s', 'eta': '00:00', 'status': "Status: Dibatalkan"
+                    })
+            else:
+                self._ui_log(f"[Error] Terjadi kesalahan saat download: {str(e)}")
+                if self.progress_callback:
+                    self.progress_callback({
+                        'percentage': 0.0, 'speed': '0 KB/s', 'eta': '00:00', 'status': "Status: Gagal"
+                    })
 
 class MyYtdlpLogger:
     def __init__(self, log_callback):

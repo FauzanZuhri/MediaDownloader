@@ -181,8 +181,8 @@ Siap diputar di:
 - [x] Automatic MP3 Conversion
 - [x] Metadata Injection
 - [x] Cover Art
-- [x] Download Archive
-- [ ] Download Progress Bar
+- [x] Download Progress Bar & Live Stats
+- [x] Live Media Preview & Quick Actions
 - [ ] Settings Page
 - [ ] Update Checker
 - [ ] Multi-language Support
