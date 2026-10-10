@@ -1,6 +1,6 @@
-# 🗺️ Roadmap & Rencana Pengembangan Masa Depan
+# 🗺️ Roadmap & Rencana Pengembangan Jangka Panjang
 
-Dokumen ini memuat peta jalan (*future plan*), strategi penomoran versi (*versioning strategy*), dan daftar target fitur untuk rilis mendatang dari **Personal Music Downloader**.
+Dokumen ini memuat visi jangka panjang, standar versi (*Semantic Versioning*), dan peta rilis bertahap dari aplikasi yang bertransformasi dari sekadar music downloader menjadi **Universal Media Hub (Audio & Video Multi-Platform)**.
 
 ---
 
@@ -10,67 +10,78 @@ Project ini mengikuti spesifikasi **[Semantic Versioning 2.0.0](https://semver.o
 
 $$\text{v}\mathbf{MAJOR}.\mathbf{MINOR}.\mathbf{PATCH}$$
 
-* **MAJOR (v2.0.0):** Perubahan arsitektur besar, perubahan UI fundamental, atau fitur yang mengubah alur kerja utama.
-* **MINOR (v1.2.0):** Penambahan fitur baru, peningkatan antarmuka, atau fungsionalitas baru yang tetap kompatibel (*backwards-compatible*).
-* **PATCH (v1.1.1):** Perbaikan bug (*bug fixes*), optimasi ukuran biner, pembaruan keamanan, atau perbaikan dependensi kecil.
+* **MAJOR (v2.0.0):** Rebranding nama project, perombakan arsitektur besar, atau integrasi multi-platform menyeluruh.
+* **MINOR (v1.2.0, v1.3.0, v1.4.0):** Penambahan fitur media baru (Video 4K, format lossless audio, selector playlist, multi-source).
+* **PATCH (v1.1.1):** Pemangkasan ukuran file (*size reduction*), perbaikan bug (*bug fixes*), atau update solver YouTube.
 
 ---
 
 ## 🚀 Rencana Rilis & Target Milestone
 
 ### 🔹 [v1.1.0] - *Current Stable Release* ✅
-- [x] Perombakan UI modern 2-kolom (*Obsidian & Indigo Theme*).
-- [x] Live Hero Media Preview Card dengan rasio aspek 16:9.
+- [x] Antarmuka modern 2-kolom (*Obsidian Dark & Indigo Theme*).
+- [x] Live Media Preview Card 16:9 dengan metadata uploader & durasi.
 - [x] Tombol cepat *Paste from Clipboard* dan *Clear*.
-- [x] Tombol *Cancel Download* yang terhubung ke interupsi *engine*.
-- [x] *Collapsible Activity Console* dengan tombol *Clear Log*.
-- [x] Perbaikan error YouTube `HTTP Error 403: Forbidden` via *remote challenge solver*.
-- [x] Tagging ID3v2.3 otomatis murni (*Title, Artist, Album, Cover Art*).
+- [x] Tombol *Cancel Download* yang terintegrasi aman dengan engine.
+- [x] *Collapsible Activity Console* dengan fitur *Clear Log*.
+- [x] Perbaikan YouTube `HTTP Error 403: Forbidden` via *remote challenge solver*.
+- [x] Auto-tagging ID3v2.3 murni (*Title, Artist, Album, Cover Art*).
 
 ---
 
-### 🔹 [v1.1.1] - *Optimization & Size Reduction (Patch)* 🎯
-Fokus: **Memangkas ukuran file rilis executable (ZIP) tanpa mengubah fungsionalitas.**
-- [ ] **Eliminasi `ffprobe.exe`:** Menghapus dependensi `ffprobe` dari build PyInstaller karena alur YouTube-to-MP3 hanya memerlukan `ffmpeg.exe` (menghemat ~35-40 MB).
-- [ ] **Kompresi Biner UPX:** Mengompres file biner `ffmpeg.exe` menggunakan *Ultimate Packer for eXecutables* (UPX) untuk mengurangi ukuran biner hingga 50%.
-- [ ] **Optimalisasi Dependensi:** Mengurangi modul yang tidak terpakai pada file `.spec`.
-- [ ] **Target Ukuran:** Menurunkan ukuran file ZIP rilis dari **~98 MB menjadi ~45-55 MB**.
+### 🔹 [v1.1.1] - *Binary Optimization & Size Reduction (Patch)* 🎯
+Fokus: **Memangkas ukuran file rilis executable (ZIP) hingga ~50% tanpa mengurangi fungsi.**
+- [ ] **Eliminasi `ffprobe.exe`:** Menghapus `ffprobe` dari bundel PyInstaller (menghemat ~35–40 MB).
+- [ ] **Kompresi Biner UPX:** Mengompres file biner `ffmpeg.exe` via UPX packer.
+- [ ] **Target Ukuran:** Menurunkan ukuran file ZIP rilis dari **~98 MB menjadi ~45–55 MB**.
 
 ---
 
-### 🔹 [v1.2.0] - *Settings Page & Smart Engine (Minor Feature)* ⚙️
-Fokus: **Pengaturan pengguna yang fleksibel dan installer ultra-ringan.**
+### 🔹 [v1.2.0] - *Full Video Engine & Quality Selector (Minor)* 🎬
+Fokus: **Membuka kapabilitas download VIDEO secara penuh (tidak hanya audio MP3).**
+- [ ] **Pilihan Resolusi Video Fleksibel:**
+  - Selector kualitas MP4/MKV: **480p, 720p, 1080p Full HD, 1440p (2K), hingga 2160p (4K 60fps)**.
+  - Penggabungan (*muxing*) otomatis stream video terbaik + stream audio terbaik via FFmpeg.
+- [ ] **Dukungan Subtitle:** Opsi unduh dan sematkan takarir (*subtitles / closed captions* `.srt`/`.vtt`).
 - [ ] **Halaman Pengaturan (Settings Modal):**
-  - Pemilihan tema warna (Dark Obsidian, Midnight Blue, Emerald Forest).
-  - Pengaturan default folder download permanen.
-  - Opsi format nama file hasil download (misal: `{artist} - {title}.mp3` atau `{title}.mp3`).
-- [ ] **Opsi Auto-Download FFmpeg (Portable Ultra-Light ~15 MB):**
-  - Menyediakan varian build *Ultra-Lightweight*: file ZIP hanya berisi aplikasi Python (~15 MB).
-  - Jika `ffmpeg.exe` belum ada, aplikasi akan menampilkan dialog konfirmasi dan otomatis mengunduh FFmpeg sekali saja di latar belakang.
-- [ ] **Pembersih Cache Arsip:** Tombol pada UI untuk melihat dan mengelola isi `download_archive.txt`.
+  - Pengaturan folder download default permanen.
+  - Pola penamaan file dinamis (misal: `{artist} - {title}` atau `{title} [{resolution}]`).
+- [ ] **Manajer Cache Arsip:** Antarmuka untuk melihat dan menghapus daftar riwayat `download_archive.txt`.
 
 ---
 
-### 🔹 [v1.3.0] - *Audio Customization & Playlist Management* 🎧
-Fokus: **Fleksibilitas audio dan kontrol playlist.**
-- [ ] **Multi-Format Export:**
-  - Tambahan dukungan format audio berkualitas tinggi: **FLAC (Lossless)**, **M4A/AAC**, dan **OGG/Opus**.
-- [ ] **Editor Metadata Manual (Opsional):**
-  - Modal untuk mengedit Judul, Artis, dan Nama Album sebelum tombol download dieksekusi.
-- [ ] **Playlist Item Selector:**
-  - Menampilkan daftar checklist lagu dalam playlist sehingga pengguna bisa memilih hanya mengunduh beberapa lagu tertentu dari playlist.
-- [ ] **Normalisasi Volume Audio (ReplayGain / Loudness Matching):**
-  - Mengaktifkan filter FFmpeg `loudnorm` agar semua lagu yang diunduh memiliki tingkat volume suara yang seragam.
+### 🔹 [v1.3.0] - *Lossless Audio & Smart Playlist Selector* 🎧
+Fokus: **Kualitas audio audiophile dan kontrol seleksi konten playlist.**
+- [ ] **Format Audio Hi-Res & Lossless:**
+  - Dukungan ekspor ke format: **FLAC (Lossless)**, **M4A/AAC (Apple Audio)**, **WAV**, dan **Opus/OGG**.
+- [ ] **Playlist Interactive Track Selector:**
+  - Tampilan daftar isi playlist (checklist lagu/video) sehingga pengguna dapat memilih hanya mengunduh item-item tertentu tanpa harus mengunduh seluruh isi playlist.
+- [ ] **Normalisasi Volume Audio (Loudness Matching):**
+  - Integrasi filter audio `loudnorm` (EBU R128) agar volume suara antar lagu seimbang saat diputar.
+- [ ] **Editor Metadata Manual:**
+  - Opsi mengubah Judul, Artis, Album, dan Gambar Cover sebelum proses unduhan disimpan.
 
 ---
 
-### 🔹 [v2.0.0] - *Major Evolution & Next-Gen Experience* 🌟
-Fokus: **Ekosistem multi-platform, integrasi layanan, dan pemutar musik internal.**
-- [ ] **Mini Music Player Internal:**
-  - Pemutar audio bawaan di dalam aplikasi untuk langsung mendengarkan lagu yang baru saja selesai diunduh.
+### 🔹 [v1.4.0] - *Multi-Platform Source Expansions* 🌐
+Fokus: **Mendukung unduhan media dari beragam platform di luar YouTube.**
+- [ ] **YouTube Shorts & Clips:** Deteksi format vertikal otomatis.
+- [ ] **SoundCloud & Bandcamp:** Unduh stream audio dan artwork resmi.
+- [ ] **TikTok & Instagram Reels:** Unduh video pendek tanpa watermark.
+- [ ] **Bilibili & Vimeo:** Dukungan ekstraksi video resolusi tinggi.
+- [ ] **Opsi Auto-Download FFmpeg (Installer Ultra-Ringan ~15 MB):**
+  - Varian build kecil yang otomatis mengunduh FFmpeg hanya jika belum tersedia di sistem user.
+
+---
+
+### 🔹 [v2.0.0] - *Rebranding & Universal Media Studio* 🌟
+Fokus: **Rebranding identitas aplikasi, media player internal, dan utilitas konversi.**
+- [ ] **Rebranding Resmi:** Mengganti nama aplikasi dari "Music Downloader" menjadi identitas media universal yang baru.
+- [ ] **Built-in Media Player:**
+  - Pemutar audio & video mini langsung di dalam aplikasi untuk preview instan setelah unduh.
+- [ ] **Local Media Converter & Audio Extractor:**
+  - Fitur drag-and-drop file video lokal milik pengguna untuk diekstrak menjadi audio MP3/FLAC secara offline.
 - [ ] **Dukungan Multi-Bahasa (i18n):**
-  - Pilihan Bahasa Indonesia dan Bahasa Inggris pada antarmuka.
+  - Bahasa Indonesia & English.
 - [ ] **Auto-Update Checker:**
-  - Notifikasi otomatis jika versi baru dirilis di GitHub Release dengan tautan unduhan langsung.
-- [ ] **Integrasi Link Eksternal:**
-  - Kemampuan parsing tautan audio dari platform lain (SoundCloud, Bandcamp).
+  - Notifikasi otomatis jika versi terbaru telah rilis di GitHub Releases dengan tombol unduh langsung.
