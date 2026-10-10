@@ -176,6 +176,8 @@ Siap diputar di:
 
 # 📌 Roadmap
 
+Rencana detail pengembangan dan pembagian versi dapat dilihat di [ROADMAP.md](ROADMAP.md).
+
 - [x] Single Download
 - [x] Playlist Download
 - [x] Automatic MP3 Conversion
