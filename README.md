@@ -53,7 +53,6 @@ Panduan ini ditujukan bagi developer yang ingin memodifikasi aplikasi.
 
 - Python **3.12**
 - FFmpeg
-- FFprobe
 
 Struktur folder:
 
@@ -72,7 +71,6 @@ Personal-Music-Downloader/
 ├── requirements.txt
 ├── README.md
 ├── ffmpeg.exe
-├── ffprobe.exe
 └── download_archive.txt
 ```
 
@@ -135,7 +133,6 @@ pyinstaller ^
 --windowed ^
 --add-data ".venv/Lib/site-packages/customtkinter;customtkinter/" ^
 --add-binary "ffmpeg.exe;." ^
---add-binary "ffprobe.exe;." ^
 main.py
 ```
 

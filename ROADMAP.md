@@ -29,11 +29,11 @@ $$\text{v}\mathbf{MAJOR}.\mathbf{MINOR}.\mathbf{PATCH}$$
 
 ---
 
-### 🔹 [v1.1.1] - *Binary Optimization & Size Reduction (Patch)* 🎯
+### 🔹 [v1.1.1] - *Binary Optimization & Size Reduction (Patch)* ✅
 Fokus: **Memangkas ukuran file rilis executable (ZIP) hingga ~50% tanpa mengurangi fungsi.**
-- [ ] **Eliminasi `ffprobe.exe`:** Menghapus `ffprobe` dari bundel PyInstaller (menghemat ~35–40 MB).
-- [ ] **Kompresi Biner UPX:** Mengompres file biner `ffmpeg.exe` via UPX packer.
-- [ ] **Target Ukuran:** Menurunkan ukuran file ZIP rilis dari **~98 MB menjadi ~45–55 MB**.
+- [x] **Eliminasi `ffprobe.exe`:** Menghapus `ffprobe` dari bundel PyInstaller (menghemat ~35–40 MB).
+- [x] **Kompresi Biner UPX:** Mengompres file biner `ffmpeg.exe` via UPX packer (menyusut dari 101.9 MB ke 31.5 MB).
+- [x] **Target Ukuran Tercapai:** Berhasil memangkas ukuran ZIP rilis dari **~98 MB menjadi 52.5 MB** (~46% reduction).
 
 ---
 

@@ -12,7 +12,7 @@ class Config:
     THEME = "dark"
     COLOR_THEME = "dark-blue"
     APP_TITLE = "Personal Music Downloader"
-    VERSION = "v1.1"
+    VERSION = "v1.1.1"
     WINDOW_SIZE = "980x760"
     
     # Palet Warna Modern Obsidian & Indigo
