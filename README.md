@@ -57,15 +57,20 @@ Panduan ini ditujukan bagi developer yang ingin memodifikasi aplikasi.
 Struktur folder:
 
 ```
-Personal-Music-Downloader/
+MediaDownloader/
 │
 ├── core/
+│   ├── archive_manager.py
 │   ├── config.py
-│   └── downloader.py
+│   ├── downloader.py
+│   ├── settings.py
+│   └── updater.py
 │
 ├── ui/
+│   ├── archive_modal.py
 │   ├── components.py
-│   └── main_window.py
+│   ├── main_window.py
+│   └── settings_modal.py
 │
 ├── main.py
 ├── requirements.txt
@@ -79,9 +84,9 @@ Personal-Music-Downloader/
 ## 1️⃣ Clone Repository
 
 ```bash
-git clone https://github.com/FauzanZuhri/Personal-Music-Downloader.git
+git clone https://github.com/FauzanZuhri/MediaDownloader.git
 
-cd Personal-Music-Downloader
+cd MediaDownloader
 ```
 
 ---
