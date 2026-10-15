@@ -1,6 +1,6 @@
-# 🎵 Personal Music Downloader
+# 📥 MediaDownloader
 
-> **Modern Desktop Music Downloader** untuk Windows yang dapat mengunduh lagu maupun playlist dari YouTube, mengubahnya menjadi **MP3 berkualitas tinggi**, serta menambahkan **metadata lengkap** dan **cover album** secara otomatis.
+> **Modern Desktop Media Downloader** untuk Windows yang dapat mengunduh audio (lagu/playlist) maupun video dari YouTube dan platform lainnya, mengubahnya secara otomatis dengan **kualitas tinggi**, serta menyematkan **metadata lengkap** dan **cover art**.
 
 ---
 
@@ -180,8 +180,8 @@ Siap diputar di:
 - [x] Cover Art
 - [x] Download Progress Bar & Live Stats
 - [x] Live Media Preview & Quick Actions
-- [ ] App Rebranding & Identity Refresh
-- [ ] Settings Page & Template Penamaan File
+- [x] **App Rebranding & Identity Refresh (MediaDownloader)**
+- [x] Settings Page, Template Penamaan File & yt-dlp Updater
 - [ ] Full Video Engine (4K MP4/MKV) & Subtitles
 - [ ] Hi-Res Lossless Audio & Chapter Splitter
 - [ ] Batch Queue & Smart Playlist Selector

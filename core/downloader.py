@@ -5,6 +5,7 @@ from io import BytesIO
 from PIL import Image
 from yt_dlp import YoutubeDL
 from core.config import Config
+from core.settings import SettingsManager
 
 # Menggunakan Mutagen untuk kompatibilitas .exe yang sempurna dan bebas error biner
 from mutagen.mp3 import MP3
@@ -142,12 +143,30 @@ class YtdlpManager:
         self.cancel_requested = False
         self._ui_log(f"[System] Memulai proses untuk: {url}")
         
+        naming_template = SettingsManager.get("naming_template", "{title}")
+        
         if 'playlist' in url.lower():
-            out_template = os.path.join(output_dir, '%(playlist_title)s', '%(title)s.%(ext)s')
             is_playlist = True
+            if naming_template == "{artist} - {title}":
+                file_pattern = "%(uploader,creator,artist)s - %(title)s.%(ext)s"
+            elif naming_template == "{title} [{id}]":
+                file_pattern = "%(title)s [%(id)s].%(ext)s"
+            elif naming_template == "{index}. {title}":
+                file_pattern = "%(playlist_index)02d. %(title)s.%(ext)s"
+            else:
+                file_pattern = "%(title)s.%(ext)s"
+            out_template = os.path.join(output_dir, '%(playlist_title)s', file_pattern)
         else:
-            out_template = os.path.join(output_dir, '%(title)s.%(ext)s')
             is_playlist = False
+            if naming_template == "{artist} - {title}":
+                file_pattern = "%(uploader,creator,artist)s - %(title)s.%(ext)s"
+            elif naming_template == "{title} [{id}]":
+                file_pattern = "%(title)s [%(id)s].%(ext)s"
+            elif naming_template == "{index}. {title}":
+                file_pattern = "%(title)s.%(ext)s"
+            else:
+                file_pattern = "%(title)s.%(ext)s"
+            out_template = os.path.join(output_dir, file_pattern)
 
         if getattr(sys, 'frozen', False):
             ffmpeg_dir = sys._MEIPASS

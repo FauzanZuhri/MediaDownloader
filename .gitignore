@@ -8,4 +8,6 @@ ffprobe.exe
 download_archive.txt
 *.lnk
 upx.exe
-ROADMAP.md
+ROADMAP.md
+settings.json
+

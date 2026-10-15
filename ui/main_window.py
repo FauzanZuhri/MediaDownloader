@@ -7,6 +7,7 @@ from io import BytesIO
 from PIL import Image
 
 from core.config import Config
+from core.settings import SettingsManager
 from ui.components import CardFrame, MediaPreviewCard, CollapsibleLogArea
 from core.downloader import YtdlpManager
 
@@ -50,7 +51,7 @@ class MainWindow(ctk.CTk):
         
         self.logo_icon = ctk.CTkLabel(
             self.title_row,
-            text="🎵",
+            text="📥",
             font=("Segoe UI Emoji", 24)
         )
         self.logo_icon.pack(side="left", padx=(0, 10))
@@ -82,11 +83,29 @@ class MainWindow(ctk.CTk):
         
         self.subtitle_label = ctk.CTkLabel(
             self.header_frame,
-            text="Modern YouTube Music & Playlist Downloader with Pure ID3v2.3 Tagging",
+            text="Universal Audio & Video Media Downloader with Auto Metadata & FFmpeg Processing",
             font=("Segoe UI", 12),
             text_color=Config.TEXT_MUTED
         )
         self.subtitle_label.grid(row=1, column=0, padx=(38, 0), sticky="w")
+        
+        # Header Right Actions: Tombol Pengaturan
+        self.header_actions = ctk.CTkFrame(self.header_frame, fg_color="transparent")
+        self.header_actions.grid(row=0, column=1, rowspan=2, sticky="e")
+        
+        self.settings_btn = ctk.CTkButton(
+            self.header_actions,
+            text="⚙️ Pengaturan",
+            font=("Segoe UI", 11, "bold"),
+            width=115,
+            height=34,
+            corner_radius=8,
+            fg_color="#202636",
+            hover_color="#2c354a",
+            text_color=Config.TEXT_MAIN,
+            command=self._open_settings_modal
+        )
+        self.settings_btn.pack(side="right")
 
         # =========================================================================
         # 2. MAIN WORKSPACE (2-COLUMN GRID)
@@ -550,3 +569,29 @@ class MainWindow(ctk.CTk):
         self.speed_label.configure(text=f"Speed: {speed}")
         self.eta_label.configure(text=f"ETA: {eta}")
         self.status_label.configure(text=status)
+
+    def _open_settings_modal(self):
+        """Membuka modal dialog Pengaturan (SettingsModal)."""
+        from ui.settings_modal import SettingsModal
+        SettingsModal(self, on_save_callback=self._apply_settings_update)
+
+    def _apply_settings_update(self, new_settings: dict):
+        """Menerapkan pembaruan pengaturan secara realtime ke UI tanpa restart."""
+        saved_dir = new_settings.get("download_dir")
+        if saved_dir:
+            self.path_entry.delete(0, "end")
+            self.path_entry.insert(0, saved_dir)
+            
+        # Re-apply warna aksen ke elemen UI
+        self.source_card_title.configure(text_color=Config.ACCENT_COLOR)
+        self.options_card_title.configure(text_color=Config.ACCENT_COLOR)
+        self.info_panel.card_header.configure(text_color=Config.ACCENT_COLOR)
+        self.version_label.configure(text_color=Config.ACCENT_COLOR)
+        self.download_btn.configure(fg_color=Config.ACCENT_COLOR, hover_color=Config.ACCENT_HOVER)
+        self.progress_bar.configure(progress_color=Config.ACCENT_COLOR)
+        self.archive_cb.configure(fg_color=Config.ACCENT_COLOR, hover_color=Config.ACCENT_HOVER)
+        self.meta_cb.configure(fg_color=Config.ACCENT_COLOR, hover_color=Config.ACCENT_HOVER)
+        self.thumb_cb.configure(fg_color=Config.ACCENT_COLOR, hover_color=Config.ACCENT_HOVER)
+        
+        tpl = new_settings.get("naming_template", "{title}")
+        self.log_area.write_log(f"[Settings] Pengaturan berhasil disimpan. Format: '{tpl}', Lokasi default: {saved_dir}")

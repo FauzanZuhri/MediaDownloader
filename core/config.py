@@ -11,8 +11,8 @@ class Config:
     # Pengaturan UI
     THEME = "dark"
     COLOR_THEME = "dark-blue"
-    APP_TITLE = "Personal Music Downloader"
-    VERSION = "v1.1.1"
+    APP_TITLE = "MediaDownloader"
+    VERSION = "v1.2.0"
     WINDOW_SIZE = "980x760"
     
     # Palet Warna Modern Obsidian & Indigo
