@@ -187,6 +187,7 @@ Siap diputar di:
 - [x] Live Media Preview & Quick Actions
 - [x] **App Rebranding & Identity Refresh (MediaDownloader)**
 - [x] Settings Page, Template Penamaan File & yt-dlp Updater
+- [ ] **Complete UI/UX 2.0 Overhaul (Next Focus)**
 - [ ] Full Video Engine (4K MP4/MKV) & Subtitles
 - [ ] Hi-Res Lossless Audio & Chapter Splitter
 - [ ] Batch Queue & Smart Playlist Selector
