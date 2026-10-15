@@ -173,8 +173,6 @@ Siap diputar di:
 
 # 📌 Roadmap
 
-Rencana detail pengembangan dan pembagian versi dapat dilihat di [ROADMAP.md](ROADMAP.md).
-
 - [x] Single Download
 - [x] Playlist Download
 - [x] Automatic MP3 Conversion
@@ -182,9 +180,13 @@ Rencana detail pengembangan dan pembagian versi dapat dilihat di [ROADMAP.md](RO
 - [x] Cover Art
 - [x] Download Progress Bar & Live Stats
 - [x] Live Media Preview & Quick Actions
-- [ ] Settings Page
-- [ ] Update Checker
-- [ ] Multi-language Support
+- [ ] App Rebranding & Identity Refresh
+- [ ] Settings Page & Template Penamaan File
+- [ ] Full Video Engine (4K MP4/MKV) & Subtitles
+- [ ] Hi-Res Lossless Audio & Chapter Splitter
+- [ ] Batch Queue & Smart Playlist Selector
+- [ ] Multi-Platform (TikTok, SoundCloud, Instagram)
+- [ ] Built-in Media Player & Converter Toolkit
 
 ---
 
