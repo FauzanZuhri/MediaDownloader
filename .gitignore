@@ -3,6 +3,7 @@ __pycache__/
 build/
 dist/
 *.spec
+!MediaDownloader.spec
 ffmpeg.exe
 ffprobe.exe
 download_archive.txt

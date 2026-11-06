@@ -24,8 +24,14 @@ NAMING_PRESETS = [
 DEFAULT_SETTINGS = {
     "download_dir": str(Path.home() / "Downloads"),
     "naming_template": "{title}",
+    "appearance_mode": "dark",
     "accent_name": "Indigo",
     "auto_check_update": True,
+    "normalize_audio": False,
+    "turbo_speed": True,
+    "minimize_to_tray": False,
+    "auto_clipboard_monitor": True,
+    "auto_switch_format": True,
 }
 
 class SettingsManager:
@@ -48,7 +54,7 @@ class SettingsManager:
         return cls._data
 
     @classmethod
-    def save(cls, new_settings: dict = None):
+    def save(cls, new_settings: dict = None, apply: bool = False):
         """Menyimpan pengaturan ke file settings.json."""
         if new_settings:
             cls._data.update(new_settings)
@@ -59,7 +65,8 @@ class SettingsManager:
         except Exception as e:
             print(f"[SettingsManager] Gagal menulis settings.json: {e}")
             
-        cls.apply_to_config()
+        if apply:
+            cls.apply_to_config()
 
     @classmethod
     def get(cls, key: str, default=None):
@@ -77,11 +84,13 @@ class SettingsManager:
     @classmethod
     def apply_to_config(cls):
         """Menerapkan preferensi warna & path ke runtime Config."""
-        accent_name = cls.get("accent_name", "Indigo")
-        if accent_name in ACCENT_PRESETS:
-            preset = ACCENT_PRESETS[accent_name]
-            Config.ACCENT_COLOR = preset["accent"]
-            Config.ACCENT_HOVER = preset["hover"]
+        mode = cls.get("appearance_mode", "dark")
+        Config.THEME = mode
+        try:
+            import customtkinter as ctk
+            ctk.set_appearance_mode(mode)
+        except Exception:
+            pass
             
         custom_dl = cls.get("download_dir")
         if custom_dl and os.path.isdir(custom_dl):
