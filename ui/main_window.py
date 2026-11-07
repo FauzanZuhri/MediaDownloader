@@ -1911,7 +1911,34 @@ class MainWindow(ctk.CTk):
         self.progress_hub.set_stage(1)
         self.progress_hub.status_text.configure(text="Status: Mengambil metadata media...")
         
+        # Fast-Path: Untuk link YouTube, langsung ekstrak cover HQ dalam <100ms
+        yt_match = re.search(r'(?:v=|\/shorts\/|\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})', url)
+        if yt_match:
+            vid_id = yt_match.group(1)
+            threading.Thread(target=self._fast_load_youtube_thumb, args=(vid_id, current_token), daemon=True).start()
+
         threading.Thread(target=self._load_preview_data, args=(url, current_token), daemon=True).start()
+
+    def _fast_load_youtube_thumb(self, vid_id: str, token: int):
+        """Fast-path loader: mengambil thumbnail YouTube langsung dalam <100ms tanpa menunggu yt-dlp."""
+        try:
+            thumb_url = f"https://i.ytimg.com/vi/{vid_id}/hqdefault.jpg"
+            resp = requests.get(thumb_url, timeout=3)
+            if resp.status_code == 200 and token == getattr(self, "_preview_token", 0):
+                raw_img = Image.open(BytesIO(resp.content))
+                img_padded = ImageOps.pad(raw_img, (210, 118), color=(18, 18, 22), method=Image.Resampling.LANCZOS)
+                photo = ctk.CTkImage(light_image=img_padded, dark_image=img_padded, size=(210, 118))
+                self.after(0, lambda: self._apply_fast_thumbnail(photo, token))
+        except Exception:
+            pass
+
+    def _apply_fast_thumbnail(self, photo, token: int):
+        """Menerapkan thumbnail instan jika proses analisis utama masih berlangsung."""
+        if token == getattr(self, "_preview_token", 0) and getattr(self, "_loading_preview_url", None) is not None:
+            self.info_panel.thumbnail_label.image = photo
+            if hasattr(self.info_panel.thumbnail_label, "_label"):
+                self.info_panel.thumbnail_label._label.image = photo
+            self.info_panel.thumbnail_label.configure(image=photo, text="")
 
     def _load_preview_data(self, url: str, token: int):
         try:

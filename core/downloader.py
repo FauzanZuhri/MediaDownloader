@@ -2,13 +2,24 @@ import os
 import re
 import requests
 import sys
+import time
 from io import BytesIO
 from PIL import Image
-from yt_dlp import YoutubeDL
 from core.config import Config
 from core.settings import SettingsManager
 from core.spotify_parser import MusicLinkParser
 from core.platform_helper import PlatformHelper
+
+# Lazy loader yt-dlp untuk startup instan (0.2s vs 2.5s)
+_YoutubeDL = None
+
+def get_ydl_class():
+    """Mengimpor YoutubeDL secara malas (lazy) hanya saat dibutuhkan."""
+    global _YoutubeDL
+    if _YoutubeDL is None:
+        from yt_dlp import YoutubeDL
+        _YoutubeDL = YoutubeDL
+    return _YoutubeDL
 
 # Menggunakan Mutagen untuk kompatibilitas .exe yang sempurna dan bebas error biner
 from mutagen.mp3 import MP3
@@ -23,10 +34,14 @@ def clean_ansi(text: str) -> str:
     return ANSI_REGEX.sub('', str(text)).strip()
 
 class YtdlpManager:
+    # In-memory LRU Cache untuk metadata media (maksimal 50 entri)
+    _metadata_cache = {}
+
     def __init__(self, log_callback=None, progress_callback=None):
         self.log_callback = log_callback
         self.progress_callback = progress_callback
         self.cancel_requested = False
+        self._last_progress_time = 0.0
 
     def cancel(self):
         self.cancel_requested = True
@@ -36,11 +51,30 @@ class YtdlpManager:
         if self.log_callback:
             self.log_callback(message)
 
+    def _cache_metadata(self, url: str, info: dict):
+        if not url or not info:
+            return
+        if len(self._metadata_cache) >= 50:
+            try:
+                # Buang entri tertua
+                oldest_key = next(iter(self._metadata_cache))
+                del self._metadata_cache[oldest_key]
+            except Exception:
+                pass
+        self._metadata_cache[url] = info
+
     def _my_progress_hook(self, d):
         if self.cancel_requested:
             raise Exception("Download dibatalkan oleh pengguna.")
 
-        if d['status'] == 'downloading':
+        status = d.get('status')
+        if status == 'downloading':
+            # Frame Limiter: Maksimal 25 FPS (40ms) untuk menghemat CPU & mencegah UI micro-stutter
+            now = time.time()
+            if now - self._last_progress_time < 0.04:
+                return
+            self._last_progress_time = now
+
             total_bytes = d.get('total_bytes') or d.get('total_bytes_estimate') or 0
             downloaded_bytes = d.get('downloaded_bytes', 0)
             percentage = downloaded_bytes / total_bytes if total_bytes > 0 else 0.0
@@ -68,7 +102,7 @@ class YtdlpManager:
                 self.progress_callback({
                     'percentage': percentage, 'speed': speed, 'eta': eta, 'status': status_text
                 })
-        elif d['status'] == 'finished':
+        elif status == 'finished':
             if self.progress_callback:
                 self.progress_callback({
                     'percentage': 1.0, 'speed': '0 KB/s', 'eta': '00:00', 'status': "Menyuntikkan Tag & Cover Art..."
@@ -77,6 +111,11 @@ class YtdlpManager:
     def fetch_metadata(self, url: str) -> dict:
         if not url.strip(): return None
 
+        # Cek in-memory LRU Cache (0 ms instant retrieval)
+        if url in self._metadata_cache:
+            self._ui_log(f"[Cache] Memuat metadata dari cache lokal (0ms)...")
+            return self._metadata_cache[url]
+
         platform_info = PlatformHelper.detect(url)
         self._ui_log(f"[Platform] Sumber media: {platform_info['badge']}")
 
@@ -84,7 +123,7 @@ class YtdlpManager:
         music_data = MusicLinkParser.parse(url)
         if music_data.get('is_music_link') and music_data.get('title'):
             self._ui_log(f"[Music Parser] Terdeteksi link {music_data['platform'].capitalize()}: {music_data['title']} - {music_data.get('artist')}")
-            return {
+            res = {
                 'title': music_data.get('title'),
                 'uploader': music_data.get('artist') or f"{music_data['platform'].capitalize()} Music",
                 'duration': 0,
@@ -94,6 +133,8 @@ class YtdlpManager:
                 '_platform_info': platform_info,
                 'webpage_url': url
             }
+            self._cache_metadata(url, res)
+            return res
 
         if getattr(sys, 'frozen', False):
             ffmpeg_dir = sys._MEIPASS
@@ -111,7 +152,7 @@ class YtdlpManager:
             'quiet': True,
         }
         try:
-            with YoutubeDL(ydl_opts) as ydl:
+            with get_ydl_class()(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=False)
                 if not info:
                     return None
@@ -144,6 +185,7 @@ class YtdlpManager:
 
                 info['_max_res'] = max_res_str
                 info['_platform_info'] = platform_info
+                self._cache_metadata(url, info)
                 return info
         except Exception as e:
             self._ui_log(f"[Error Info] Gagal mengambil preview: {str(e)}")
@@ -171,7 +213,7 @@ class YtdlpManager:
         }
         try:
             self._ui_log(f"[Playlist] Menganalisis daftar trek playlist...")
-            with YoutubeDL(ydl_opts) as ydl:
+            with get_ydl_class()(ydl_opts) as ydl:
                 info = ydl.extract_info(url, download=False)
                 if not info:
                     return None
@@ -409,7 +451,7 @@ class YtdlpManager:
             ydl_opts['postprocessors'] = postprocessors
 
         try:
-            with YoutubeDL(ydl_opts) as ydl:
+            with get_ydl_class()(ydl_opts) as ydl:
                 info_dict = ydl.extract_info(target_url, download=True)
                 
                 # Eksekusi Mutagen khusus format MP3

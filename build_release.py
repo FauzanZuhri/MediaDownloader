@@ -35,7 +35,7 @@ def build():
     zip_path = os.path.join("dist", zip_filename)
     print(f"[*] Packaging release into {zip_path}...")
 
-    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as zipf:
         for root, dirs, files in os.walk(dist_folder):
             for file in files:
                 full_path = os.path.join(root, file)

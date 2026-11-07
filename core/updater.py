@@ -1,13 +1,13 @@
 import sys
 import subprocess
 import requests
-import yt_dlp
 
 class YtdlpUpdater:
     @staticmethod
     def get_current_version() -> str:
         """Mengambil versi yt-dlp yang saat ini terpasang."""
         try:
+            import yt_dlp
             return yt_dlp.version.__version__
         except Exception:
             return "Unknown"
